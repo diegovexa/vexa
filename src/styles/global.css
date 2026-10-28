@@ -1,0 +1,11 @@
+/* Reset global: sin el margen por defecto del navegador (dejaba un borde blanco alrededor de la página) */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: #0a0a0a;
+}
+
+#root {
+  min-height: 100vh;
+}

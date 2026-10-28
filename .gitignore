@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.env.local
+.env*.local
+*.log
+
+# Material fuente (PDFs, listas, flyers de WhatsApp): no hace falta para el sitio
+*.pdf
+*.csv
+WhatsApp Image*
+# Config local de Claude Code (la conexión MCP compartida está en .mcp.json)
+.claude/
