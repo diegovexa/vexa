@@ -4,6 +4,7 @@ export const LINEAS = [
   'Keratina Revitalize',
   'Neutro Balance',
   'Extra Acida Intense',
+  'Colágeno Anti Age',
 ];
 
 export const TIPOS = ['Shampoo', 'Máscara', 'Ampollas', 'Protector térmico'];

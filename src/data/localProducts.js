@@ -4,7 +4,7 @@
 // Modos de uso: borrador con el uso profesional estándar; confirmar con la marca.
 import { img } from './lineas';
 
-export const PRODUCTS_VERSION = 4;
+export const PRODUCTS_VERSION = 5;
 
 const base = (p) => ({
   active: true,
@@ -92,6 +92,16 @@ export const LOCAL_PRODUCTS = [
     modo_uso: USO.protector,
   }),
   base({
+    // Precio: igual al protector Biotina (confirmado por el cliente, no figura en la lista)
+    id: 'local-colageno-protector', linea: 'Colágeno Anti Age', producto: 'Protector térmico Colágeno Anti Age', tipo: 'Protector térmico',
+    ph: '-', image: 'colageno-protector', nuevo: true,
+    variantes: [{ tamanio: '200 ml', precio: 24200 }, { tamanio: '100 ml', precio: 12210 }],
+    descripcion: 'Protector térmico anti age con colágeno y elastina. Protege el cabello del calor hasta 230 °C, repara y potencia su brillo. Sin enjuague, de uso profesional.',
+    beneficios: 'Protege hasta 230 °C - Colágeno y elastina - Brillo y suavidad - Fortalece y repara',
+    indicaciones: 'Antes de secador - Planchita - Buclera',
+    modo_uso: USO.protector,
+  }),
+  base({
     id: 'local-keratina-shampoo', linea: 'Keratina Revitalize', producto: 'Shampoo Keratina Revitalize', tipo: 'Shampoo',
     ph: '5', image: 'keratina-shampoo', variantes: SH_PRO,
     descripcion: 'Repara y fortalece la fibra capilar dañada, le devuelve soltura y flexibilidad natural, logrando un cabello suave con brillo y vitalidad. Reestructurante y anti-frizz, ideal para cabellos quebradizos y maltratados.',
@@ -135,7 +145,7 @@ export const LOCAL_PRODUCTS = [
   }),
 ];
 
-// Lanzamiento sin precio en la lista: se muestra en la landing, no en el catálogo.
+// Protectores térmicos: se destacan en la sección "Nuevo" del inicio.
 export const LANZAMIENTOS = [
   {
     nombre: 'Protector térmico Biotina Therapy',
@@ -143,12 +153,14 @@ export const LANZAMIENTOS = [
     image: 'promo-biotina-protector',
     color: '#B430DE',
     disponible: true,
+    link: '/catalogo?tipo=Protector%20t%C3%A9rmico',
   },
   {
     nombre: 'Protector térmico Colágeno Anti Age',
     detalle: 'Con colágeno y elastina · Brillo y suavidad · 100 y 200 ml',
     image: 'promo-colageno',
     color: '#C9A24B',
-    disponible: false,
+    disponible: true,
+    link: '/catalogo?tipo=Protector%20t%C3%A9rmico',
   },
 ];

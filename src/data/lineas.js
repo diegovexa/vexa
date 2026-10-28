@@ -101,6 +101,16 @@ export function getLinea(slug) {
   return LINEAS_INFO.find((l) => l.slug === slug);
 }
 
+// Líneas que solo tienen protector térmico: aparecen en el catálogo pero no tienen página propia
+export const LINEAS_EXTRA = [
+  {
+    nombre: 'Colágeno Anti Age',
+    key: 'Colágeno Anti Age',
+    color: '#C9A24B',
+    soft: '#3a2f12',
+  },
+];
+
 export function getLineaByKey(key) {
-  return LINEAS_INFO.find((l) => l.key === key);
+  return LINEAS_INFO.find((l) => l.key === key) || LINEAS_EXTRA.find((l) => l.key === key);
 }

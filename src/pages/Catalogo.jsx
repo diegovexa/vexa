@@ -395,7 +395,10 @@ export default function Catalogo() {
     const l = searchParams.get("linea");
     return LINEAS.includes(l) ? l : "todas";
   });
-  const [tipoFilter, setTipoFilter] = useState("todos");
+  const [tipoFilter, setTipoFilter] = useState(() => {
+    const t = searchParams.get("tipo");
+    return TIPOS.includes(t) ? t : "todos";
+  });
   const [search, setSearch] = useState("");
   const [view, setView] = useState("catalog");
   const [toast, setToast] = useState(null);

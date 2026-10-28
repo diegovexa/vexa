@@ -212,7 +212,7 @@ export default function Landing() {
                 <h3>{l.nombre}</h3>
                 <p>{l.detalle}</p>
                 {l.disponible ? (
-                  <Link to="/catalogo?linea=Biotina%20Therapy" className="btn btn-light">Comprar</Link>
+                  <Link to={l.link} className="btn btn-light">Comprar</Link>
                 ) : (
                   <a href={WA_URL} target="_blank" rel="noreferrer" className="btn btn-ghost">Consultar por WhatsApp</a>
                 )}

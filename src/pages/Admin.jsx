@@ -637,11 +637,43 @@ const NAV = [
 function AdminApp() {
   const { orders, signOut, user, localMode } = useApp();
   const [page, setPage] = useState("products");
+  const [menuOpen, setMenuOpen] = useState(false);
   const pending = orders.filter(o => o.status === "pendiente").length;
+  const current = NAV.find(n => n.id === page);
+
+  // En celular el menú es un panel que se abre con ☰; se cierra con Esc o tocando afuera
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKey = (e) => e.key === "Escape" && setMenuOpen(false);
+    document.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [menuOpen]);
+
+  function goTo(id) {
+    setPage(id);
+    setMenuOpen(false);
+    window.scrollTo(0, 0);
+  }
 
   return (
     <div className="admin-layout">
-      <div className="admin-sidebar">
+      <header className="admin-topbar">
+        <button className="admin-burger" onClick={() => setMenuOpen(true)} aria-label="Abrir menú" aria-expanded={menuOpen}>
+          <span /><span /><span />
+          {pending > 0 && <i className="admin-burger-dot" aria-hidden="true" />}
+        </button>
+        <div className="admin-topbar-title">{current?.icon} {current?.label}</div>
+        <img className="admin-topbar-logo" src={img("logo-black")} alt="Vexa" />
+      </header>
+
+      <div className={`admin-backdrop ${menuOpen ? "is-open" : ""}`} onClick={() => setMenuOpen(false)} aria-hidden="true" />
+
+      <div className={`admin-sidebar ${menuOpen ? "is-open" : ""}`}>
+        <button className="admin-sidebar-close" onClick={() => setMenuOpen(false)} aria-label="Cerrar menú">✕</button>
         <div className="admin-sidebar-brand">
           <div className="admin-sidebar-brand-name">✨ Admin Vexa</div>
           <div className="admin-sidebar-brand-email">{user?.email}</div>
@@ -649,7 +681,7 @@ function AdminApp() {
         </div>
         <nav className="admin-sidebar-nav">
           {NAV.map(n => (
-            <button key={n.id} onClick={() => setPage(n.id)}
+            <button key={n.id} onClick={() => goTo(n.id)}
               className={`admin-nav-btn ${page === n.id ? 'active' : ''}`}>
               <span className="admin-nav-icon">{n.icon}</span>
               {n.label}
