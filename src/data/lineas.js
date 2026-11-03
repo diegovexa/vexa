@@ -108,6 +108,9 @@ export const LINEAS_EXTRA = [
     key: 'Colágeno Anti Age',
     color: '#C9A24B',
     soft: '#3a2f12',
+    necesidad: 'Protección térmica',
+    claim: 'Protege del calor hasta 230 °C con colágeno y elastina.',
+    destacado: 'colageno-protector',
   },
 ];
 

@@ -2,9 +2,10 @@ import { useState, useMemo, useRef, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useApp } from "../context/AppContext";
 import { formatPrice, SELLER_PHONE, LINEAS, TIPOS } from "../data/store";
-import { buildCombos, computeCart, getTiers } from "../data/pricing";
+import { buildCombos, computeCart } from "../data/pricing";
 import { img, getLineaByKey } from "../data/lineas";
 import ProductImage from "../components/ProductImage";
+import ProductShowcase from "../components/ProductShowcase";
 import "../styles/catalogo.css";
 
 function WhatsAppIcon({ size = 20 }) {
@@ -229,24 +230,70 @@ function ComboCard({ combo, onAdd }) {
   );
 }
 
-function TierBanner({ tiers, comboPct, onCombos }) {
-  if (!tiers.length && !comboPct) return null;
+// Hero: vitrina animada con el nombre, la necesidad y el acceso a cada línea
+function CatalogHero({ onPick }) {
   return (
-    <div className="tier-banner">
-      {tiers.length > 0 && (
-        <div className="tier-banner-main">
-          <strong>Descuento por cantidad</strong>
-          <span>Mezclá shampoos, máscaras, ampollas y combos para llegar:</span>
-          <div className="tier-chips">
-            {tiers.map(t => <span key={t.min}>{t.min}+ u. <b>-{t.pct}%</b></span>)}
-          </div>
+    <ProductShowcase
+      className="chero"
+      renderCopy={(l, i, n, isActive) => (
+        <div className="chero-copy">
+          <span className="chero-index">{String(i + 1).padStart(2, "0")} / {String(n).padStart(2, "0")} · {l.necesidad}</span>
+          <h2>{l.nombre}</h2>
+          <p>{l.claim}</p>
+          <button className="chero-cta" tabIndex={isActive ? 0 : -1} onClick={() => onPick(l.key)}>
+            Ver la línea <span aria-hidden="true">→</span>
+          </button>
         </div>
       )}
-      {comboPct > 0 && (
-        <button className="tier-banner-combo" onClick={onCombos}>
-          Tratamiento completo <b>-{comboPct}%</b> →
-        </button>
-      )}
+    />
+  );
+}
+
+// Selector de categoría colapsado: muestra la selección actual y se despliega al tocarlo
+function CategoryPicker({ lineaFilter, setLineaFilter, tipoFilter, setTipoFilter, tipos }) {
+  const [open, setOpen] = useState(false);
+  const linea = lineaFilter !== "todas" ? getLineaByKey(lineaFilter) : null;
+  const activos = (linea ? 1 : 0) + (tipoFilter !== "todos" ? 1 : 0);
+
+  return (
+    <div className={`catpick ${open ? "is-open" : ""}`}>
+      <button className="catpick-toggle" aria-expanded={open} aria-controls="catpick-panel" onClick={() => setOpen(o => !o)}>
+        <span className="catpick-label">Categoría</span>
+        <span className="catpick-current">
+          {activos === 0 && "Todas"}
+          {linea && <span className="catpick-chip" style={{ "--accent": linea.color }}><i className="pill-dot" />{linea.nombre}</span>}
+          {tipoFilter !== "todos" && <span className="catpick-chip">{tipoFilter}</span>}
+        </span>
+        <span className="catpick-chev" aria-hidden="true">▾</span>
+      </button>
+
+      <div className="catpick-panel" id="catpick-panel">
+        <div className="catpick-inner">
+          <div className="catpick-group">
+            <span className="catpick-title">Línea</span>
+            <div className="catalogo-filters">
+              <button onClick={() => setLineaFilter("todas")} className={`filter-pill ${lineaFilter === "todas" ? "active" : ""}`}>Todas</button>
+              {LINEAS.map(l => (
+                <button key={l} onClick={() => setLineaFilter(lineaFilter === l ? "todas" : l)}
+                  className={`filter-pill ${lineaFilter === l ? "active" : ""}`}
+                  style={{ "--accent": getLineaByKey(l)?.color }}>
+                  <i className="pill-dot" />{getLineaByKey(l)?.nombre || l}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="catpick-group">
+            <span className="catpick-title">Producto</span>
+            <div className="catalogo-filters">
+              <button onClick={() => setTipoFilter("todos")} className={`filter-pill ${tipoFilter === "todos" ? "active" : ""}`}>Todos</button>
+              {tipos.map(t => (
+                <button key={t} onClick={() => setTipoFilter(tipoFilter === t ? "todos" : t)} className={`filter-pill ${tipoFilter === t ? "active" : ""}`}>{t}</button>
+              ))}
+            </div>
+          </div>
+          <button className="catpick-done" onClick={() => setOpen(false)}>Listo</button>
+        </div>
+      </div>
     </div>
   );
 }
@@ -399,7 +446,6 @@ export default function Catalogo() {
     const t = searchParams.get("tipo");
     return TIPOS.includes(t) ? t : "todos";
   });
-  const [search, setSearch] = useState("");
   const [view, setView] = useState("catalog");
   const [toast, setToast] = useState(null);
   const [bump, setBump] = useState(false);
@@ -407,22 +453,16 @@ export default function Catalogo() {
 
   useEffect(() => { window.scrollTo(0, 0); }, [view, vista]);
 
-  const tiers = getTiers(config);
   const combos = useMemo(() => buildCombos(products, config), [products, config]);
   const comboPct = combos[0]?.pct ?? 0;
   const summary = useMemo(() => computeCart(cart, config), [cart, config]);
 
   const filtered = useMemo(() => products.filter(p => {
     if (!p.active || !p.variantes?.length) return false;
-    const q = search.toLowerCase();
     const lineaOk = lineaFilter === "todas" || p.linea === lineaFilter;
     const tipoOk = tipoFilter === "todos" || p.tipo === tipoFilter;
-    const searchOk = !q ||
-      p.producto.toLowerCase().includes(q) ||
-      p.linea.toLowerCase().includes(q) ||
-      p.descripcion?.toLowerCase().includes(q);
-    return lineaOk && tipoOk && searchOk;
-  }), [products, lineaFilter, tipoFilter, search]);
+    return lineaOk && tipoOk;
+  }), [products, lineaFilter, tipoFilter]);
 
   const tiposDisponibles = TIPOS.filter(t => products.some(p => p.active && p.tipo === t));
 
@@ -431,6 +471,16 @@ export default function Catalogo() {
     if (v === "combos") next.set("vista", "combos"); else next.delete("vista");
     setSearchParams(next, { replace: true });
     setView("catalog");
+  }
+
+  // Desde el hero: filtra por la línea y baja hasta los productos
+  function pickLinea(key) {
+    setLineaFilter(key);
+    setTipoFilter("todos");
+    if (vista !== "productos") setVista("productos");
+    requestAnimationFrame(() => {
+      document.getElementById("catalogo-productos")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
   }
 
   function handleAdd(item, qty, imgEl) {
@@ -448,7 +498,7 @@ export default function Catalogo() {
     return (
       <div className="catalogo-loading">
         <div className="catalogo-loading-inner">
-          <img src={img("logo-black")} alt="Vexa" className="catalogo-loading-logo" />
+          <img src={img("logo-white")} alt="Vexa" className="catalogo-loading-logo" />
           <div className="catalogo-loading-text">Cargando catálogo...</div>
         </div>
       </div>
@@ -475,7 +525,7 @@ export default function Catalogo() {
       <header className="catalogo-header">
         <div className="catalogo-header-inner">
           <Link to="/" className="catalogo-brand">
-            <img className="catalogo-logo" src={img("logo-black")} alt="Vexa Hair Evolution" />
+            <img className="catalogo-logo" src={img("logo-white")} alt="Vexa Hair Evolution" />
             <span className="catalogo-brand-sub">CATÁLOGO MAYORISTA</span>
           </Link>
           <button
@@ -494,7 +544,9 @@ export default function Catalogo() {
       <main className="catalogo-content">
         {view === "catalog" ? (
           <>
-            <div className="vista-tabs" role="tablist">
+            <CatalogHero onPick={pickLinea} />
+
+            <div className="vista-tabs" role="tablist" id="catalogo-productos">
               <button role="tab" aria-selected={vista === "productos"} className={vista === "productos" ? "is-active" : ""} onClick={() => setVista("productos")}>
                 Productos
               </button>
@@ -503,34 +555,13 @@ export default function Catalogo() {
               </button>
             </div>
 
-            <TierBanner tiers={tiers} comboPct={vista === "productos" ? comboPct : 0} onCombos={() => setVista("combos")} />
-
             {vista === "productos" ? (
               <>
-                <div className="catalogo-search-wrap">
-                  <input
-                    className="catalogo-search"
-                    type="search" placeholder="Buscar producto o línea..."
-                    value={search} onChange={e => setSearch(e.target.value)}
-                    aria-label="Buscar"
-                  />
-                  <div className="catalogo-filters">
-                    <button onClick={() => setLineaFilter("todas")} className={`filter-pill ${lineaFilter === "todas" ? "active" : ""}`}>Todas</button>
-                    {LINEAS.map(l => (
-                      <button key={l} onClick={() => setLineaFilter(lineaFilter === l ? "todas" : l)}
-                        className={`filter-pill ${lineaFilter === l ? "active" : ""}`}
-                        style={{ "--accent": getLineaByKey(l)?.color }}>
-                        <i className="pill-dot" />{getLineaByKey(l)?.nombre || l}
-                      </button>
-                    ))}
-                  </div>
-                  <div className="catalogo-filters">
-                    <button onClick={() => setTipoFilter("todos")} className={`filter-pill ${tipoFilter === "todos" ? "active" : ""}`}>Todos</button>
-                    {tiposDisponibles.map(t => (
-                      <button key={t} onClick={() => setTipoFilter(tipoFilter === t ? "todos" : t)} className={`filter-pill ${tipoFilter === t ? "active" : ""}`}>{t}</button>
-                    ))}
-                  </div>
-                </div>
+                <CategoryPicker
+                  lineaFilter={lineaFilter} setLineaFilter={setLineaFilter}
+                  tipoFilter={tipoFilter} setTipoFilter={setTipoFilter}
+                  tipos={tiposDisponibles}
+                />
 
                 <div className="catalogo-count">
                   {filtered.length} producto{filtered.length !== 1 ? "s" : ""}

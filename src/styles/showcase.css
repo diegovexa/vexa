@@ -1,0 +1,164 @@
+/* ============================================
+   Vitrina animada de productos (ProductShowcase)
+   Quien la usa ubica las piezas con estas variables:
+   --ps-stage-h   alto del producto          --ps-bottom    distancia del producto al borde inferior
+   --ps-word-top  altura del nombre de fondo --ps-justify   alineación del producto (center / flex-end)
+   --ps-pad-right margen derecho del producto --ps-dots-x   margen lateral de las barras de progreso
+   --ps-glow-x    posición horizontal del brillo
+   ============================================ */
+
+/* Registrada para que el brillo de fondo cambie de color con transición */
+@property --ps-accent {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #ebb503;
+}
+
+.ps {
+  --ps-stage-h: 62%;
+  --ps-bottom: 56px;
+  --ps-word-top: 34%;
+  --ps-justify: center;
+  --ps-pad-right: 0px;
+  --ps-dots-x: 20px;
+  --ps-glow-x: 50%;
+  position: relative;
+  overflow: hidden;
+  container-type: inline-size;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: --ps-accent 0.9s ease;
+}
+.ps *, .ps *::before, .ps *::after { box-sizing: border-box; }
+
+.ps-glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(55% 55% at var(--ps-glow-x) 62%, color-mix(in srgb, var(--ps-accent) 40%, transparent), transparent 70%),
+    radial-gradient(80% 45% at 20% 110%, color-mix(in srgb, var(--ps-accent) 16%, transparent), transparent 70%);
+  pointer-events: none;
+}
+
+/* Cada slide es una capa fija; lo que se mueve son sus piezas según la posición:
+   is-next (espera a la derecha) → is-active → is-prev (sale despedido a la izquierda) */
+.ps-slide {
+  --off: 0;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.ps-slide.is-active { pointer-events: auto; z-index: 1; }
+.ps-slide.is-far { visibility: hidden; }
+.ps-slide.is-far * { transition: none !important; }
+
+/* Nombre gigante detrás del producto, con parallax.
+   Arranca con un tamaño estimado y el componente lo ajusta al ancho exacto. */
+.ps-word {
+  --chars: 7;
+  position: absolute;
+  left: 50%;
+  top: var(--ps-word-top);
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  font-size: calc((100cqw - 24px) / (var(--chars) * 0.64));
+  line-height: 1;
+  letter-spacing: -0.06em;
+  white-space: nowrap;
+  color: transparent;
+  -webkit-text-stroke: 1px color-mix(in srgb, var(--accent) 50%, transparent);
+  transform: translate(calc(-50% + var(--off) * 70%), -50%);
+  opacity: calc(1 - var(--off) * var(--off));
+  transition: transform 1.1s cubic-bezier(.22, 1, .36, 1), opacity 0.6s;
+  pointer-events: none;
+}
+
+/* Producto: el que entra llega rápido desde la derecha y "choca" al activo,
+   que sale despedido girando hacia la izquierda */
+.ps-stage {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: var(--ps-bottom);
+  height: var(--ps-stage-h);
+  padding-right: var(--ps-pad-right);
+  display: flex;
+  justify-content: var(--ps-justify);
+  align-items: flex-end;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.ps-product {
+  display: block;
+  height: 100%;
+  max-width: 78%;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 26px 30px rgba(0, 0, 0, 0.65));
+  transform-origin: 50% 100%;
+  will-change: transform;
+  user-select: none;
+}
+.is-next .ps-product, .is-far .ps-product { transform: translateX(110cqw) rotate(8deg); }
+.is-active .ps-product {
+  transform: none;
+  transition: transform 0.85s cubic-bezier(.2, 1.15, .35, 1);
+  animation: psImpact 0.85s ease-out;
+}
+.is-prev .ps-product {
+  transform: translateX(-120cqw) translateY(-14px) rotate(-18deg) scale(0.9);
+  transition: transform 0.9s cubic-bezier(.35, .2, .25, 1) 0.13s;
+}
+/* Al frenar, el producto se aplasta apenas y rebota */
+@keyframes psImpact {
+  0%, 22% { scale: 1; }
+  34% { scale: 1.06 0.95; }
+  52% { scale: 0.98 1.03; }
+  70%, 100% { scale: 1; }
+}
+
+/* Progreso tipo "historias": la barra activa se llena mientras dura el slide */
+.ps-dots {
+  position: absolute;
+  left: var(--ps-dots-x);
+  right: var(--ps-dots-x);
+  bottom: 18px;
+  display: flex;
+  gap: 6px;
+  z-index: 2;
+}
+.ps-dot {
+  flex: 1;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+.ps-dot i {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 3px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.18);
+  overflow: hidden;
+}
+.ps-dot i::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+.ps-dot.is-active i::after { animation: psFill var(--dur) linear forwards; }
+.ps-dot.is-paused i::after { animation-play-state: paused; }
+@keyframes psFill { to { transform: scaleX(1); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .ps *, .ps *::before, .ps *::after { animation: none !important; transition: none !important; }
+}

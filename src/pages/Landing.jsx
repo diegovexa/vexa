@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { SiteHeader, SiteFooter, WA_URL, scrollToId } from "../components/SiteChrome";
 import ProductImage from "../components/ProductImage";
+import ProductShowcase from "../components/ProductShowcase";
 import { BRAND, LINEAS_INFO, img, getLineaByKey } from "../data/lineas";
 import { LANZAMIENTOS } from "../data/localProducts";
 import { formatPrice, minPrice } from "../data/store";
@@ -125,6 +126,7 @@ export default function Landing() {
       <section className="hero">
         <div className="hero-bg" aria-hidden="true" />
         <div className="hero-inner">
+          <ProductShowcase className="hero-showcase" />
           <div className="hero-copy">
             <span className="eyebrow">{BRAND.claim}</span>
             <h1>
@@ -139,20 +141,6 @@ export default function Landing() {
               <Link to="/catalogo" className="btn btn-light">Ver catálogo mayorista</Link>
               <button className="btn btn-ghost" onClick={() => scrollToId("lineas")}>Conocé las líneas</button>
             </div>
-
-            {comboPct > 0 && (
-              <Link to="/catalogo?vista=combos" className="combo-cta">
-                <span className="combo-cta-pct">-{comboPct}%</span>
-                <span className="combo-cta-text">
-                  <strong>Comprando el tratamiento completo tenés {comboPct}% de descuento</strong>
-                  <small>Shampoo + máscara + ampollas de la misma línea</small>
-                </span>
-                <span className="combo-cta-arrow" aria-hidden="true">→</span>
-              </Link>
-            )}
-          </div>
-          <div className="hero-media">
-            <img src={img("hero-lineup")} alt="Línea completa Vexa: shampoo, máscaras y ampollas" />
           </div>
         </div>
       </section>

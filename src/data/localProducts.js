@@ -4,7 +4,7 @@
 // Modos de uso: borrador con el uso profesional estándar; confirmar con la marca.
 import { img } from './lineas';
 
-export const PRODUCTS_VERSION = 5;
+export const PRODUCTS_VERSION = 6;
 
 const base = (p) => ({
   active: true,
@@ -84,7 +84,7 @@ export const LOCAL_PRODUCTS = [
   }),
   base({
     id: 'local-biotina-protector', linea: 'Biotina Therapy', producto: 'Protector térmico Biotina Therapy', tipo: 'Protector térmico',
-    ph: '-', image: 'biotina-protector', nuevo: true,
+    ph: '-', image: 'biotina-protector-foto', foto: true, nuevo: true,
     variantes: [{ tamanio: '200 ml', precio: 24200 }, { tamanio: '100 ml', precio: 12210 }],
     descripcion: 'Protector térmico con biotina y pantenol. Heat shield hasta 230 °C, sin enjuague y apto para uso diario: protege y fortalece el cabello antes del secador o la planchita.',
     beneficios: 'Protege hasta 230 °C - Biotina y pantenol - Sin enjuague - Apto uso diario',
@@ -94,7 +94,7 @@ export const LOCAL_PRODUCTS = [
   base({
     // Precio: igual al protector Biotina (confirmado por el cliente, no figura en la lista)
     id: 'local-colageno-protector', linea: 'Colágeno Anti Age', producto: 'Protector térmico Colágeno Anti Age', tipo: 'Protector térmico',
-    ph: '-', image: 'colageno-protector', nuevo: true,
+    ph: '-', image: 'colageno-protector-foto', foto: true, nuevo: true,
     variantes: [{ tamanio: '200 ml', precio: 24200 }, { tamanio: '100 ml', precio: 12210 }],
     descripcion: 'Protector térmico anti age con colágeno y elastina. Protege el cabello del calor hasta 230 °C, repara y potencia su brillo. Sin enjuague, de uso profesional.',
     beneficios: 'Protege hasta 230 °C - Colágeno y elastina - Brillo y suavidad - Fortalece y repara',
