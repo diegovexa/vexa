@@ -1,12 +1,12 @@
 import { supabase } from '../config/supabase';
 import { LOCAL_PRODUCTS, PRODUCTS_VERSION } from '../data/localProducts';
-import { normalizeProduct } from '../data/store';
+import { normalizeProduct, sortProducts } from '../data/store';
 import { isLocalMode, setLocalMode, localDB, localId, withDeadline } from './backend';
 
 const BUCKET = 'productos';
 const LOCAL_KEY = `vexa.products.v${PRODUCTS_VERSION}`;
 
-const localProducts = () => localDB.get(LOCAL_KEY, LOCAL_PRODUCTS).map(normalizeProduct);
+const localProducts = () => sortProducts(localDB.get(LOCAL_KEY, LOCAL_PRODUCTS).map(normalizeProduct));
 const saveLocal = (list) => localDB.set(LOCAL_KEY, list);
 
 function toRow(p) {
@@ -36,7 +36,7 @@ export const productsService = {
         .order('linea', { ascending: true })
         .order('producto', { ascending: true }));
       if (error) throw error;
-      return (data || []).map(normalizeProduct);
+      return sortProducts((data || []).map(normalizeProduct));
     } catch (err) {
       console.warn('Supabase no responde, usando modo local:', err.message);
       setLocalMode(true);

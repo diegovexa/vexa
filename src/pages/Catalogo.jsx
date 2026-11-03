@@ -1,11 +1,13 @@
-import { useState, useMemo, useRef, useEffect } from "react";
+import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { Link, useSearchParams } from "react-router-dom";
+import { createPortal } from "react-dom";
 import { useApp } from "../context/AppContext";
 import { formatPrice, SELLER_PHONE, LINEAS, TIPOS } from "../data/store";
 import { buildCombos, computeCart } from "../data/pricing";
 import { img, getLineaByKey } from "../data/lineas";
 import ProductImage from "../components/ProductImage";
 import ProductShowcase from "../components/ProductShowcase";
+import { SiteFooter } from "../components/SiteChrome";
 import "../styles/catalogo.css";
 
 function WhatsAppIcon({ size = 20 }) {
@@ -76,12 +78,70 @@ function QtyControl({ qty, setQty }) {
   );
 }
 
+// Detalle del producto en una tarjeta emergente (abajo en mobile, centrada en pantallas grandes)
+function ProductDetail({ product, accent, onClose }) {
+  const closeRef = useRef();
+  const linea = getLineaByKey(product.linea);
+  const beneficios = product.beneficios ? product.beneficios.split(" - ") : [];
+
+  useEffect(() => {
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    closeRef.current?.focus();
+    const onKey = (e) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [onClose]);
+
+  return createPortal(
+    <div className="pdetail-layer" onClick={onClose}>
+      <div
+        className="pdetail"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={`pdetail-${product.id}`}
+        style={{ "--accent": accent }}
+        onClick={e => e.stopPropagation()}
+      >
+        <button ref={closeRef} className="pdetail-close" aria-label="Cerrar" onClick={onClose}>✕</button>
+        <div className="pdetail-head">
+          <ProductImage product={product} className="pdetail-img" />
+          <div>
+            <div className="pcard-kind">{linea?.nombre || product.linea} · {product.tipo}{product.ph && product.ph !== "-" ? ` · pH ${product.ph}` : ""}</div>
+            <h3 className="pdetail-name" id={`pdetail-${product.id}`}>{product.producto}</h3>
+            <div className="pdetail-sizes">
+              {product.variantes.map(v => <span key={v.tamanio}>{v.tamanio} <b>{formatPrice(v.precio)}</b></span>)}
+            </div>
+          </div>
+        </div>
+        <div className="pdetail-body">
+          {product.descripcion && <p>{product.descripcion}</p>}
+          {beneficios.length > 0 && (
+            <div className="pcard-tags">{beneficios.map(b => <span key={b}>{b}</span>)}</div>
+          )}
+          {product.indicaciones && (
+            <div className="pdetail-block"><strong>Indicado para</strong><span>{product.indicaciones.split(" - ").join(" · ")}</span></div>
+          )}
+          {product.modo_uso && (
+            <div className="pdetail-block pcard-uso"><strong>Modo de uso</strong><span>{product.modo_uso}</span></div>
+          )}
+        </div>
+      </div>
+    </div>,
+    document.body
+  );
+}
+
 function ProductCard({ product, onAdd }) {
   const [sizeIdx, setSizeIdx] = useState(0);
   const [qty, setQty] = useState(1);
   const [open, setOpen] = useState(false);
   const [added, setAdded] = useState(false);
   const imgRef = useRef();
+  const closeDetail = useCallback(() => setOpen(false), []);
   const linea = getLineaByKey(product.linea);
   const accent = linea?.color || "#1a1a1a";
   const variante = product.variantes[sizeIdx] || product.variantes[0];
@@ -133,21 +193,11 @@ function ProductCard({ product, onAdd }) {
           </button>
         </div>
 
-        <button className="pcard-more" aria-expanded={open} onClick={() => setOpen(o => !o)}>
-          {open ? "Ocultar detalle" : "Ver detalle y modo de uso"} <span className={open ? "rot" : ""}>▾</span>
+        <button className="pcard-more" aria-haspopup="dialog" onClick={() => setOpen(true)}>
+          Ver detalle y modo de uso <span aria-hidden="true">›</span>
         </button>
 
-        {open && (
-          <div className="pcard-detail">
-            {product.descripcion && <p>{product.descripcion}</p>}
-            {product.indicaciones && (
-              <div><strong>Indicado para</strong><span>{product.indicaciones.split(" - ").join(" · ")}</span></div>
-            )}
-            {product.modo_uso && (
-              <div className="pcard-uso"><strong>Modo de uso</strong><span>{product.modo_uso}</span></div>
-            )}
-          </div>
-        )}
+        {open && <ProductDetail product={product} accent={accent} onClose={closeDetail} />}
       </div>
     </article>
   );
@@ -603,6 +653,9 @@ export default function Catalogo() {
           <CartView summary={summary} onClose={() => setView("catalog")} onSent={clearCart} />
         )}
       </main>
+
+      {/* Mismo pie que el resto del sitio (con el crédito del desarrollador) */}
+      <div className="site catalogo-footer"><SiteFooter /></div>
 
       {view === "catalog" && unidades > 0 && (
         <div className="cart-bar" role="region" aria-label="Resumen del pedido">

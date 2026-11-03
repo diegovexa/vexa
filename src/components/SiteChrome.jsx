@@ -8,6 +8,10 @@ export const WA_URL = `https://wa.me/${SELLER_PHONE}?text=${encodeURIComponent(
   "Hola! Quiero información para comprar Vexa por mayor."
 )}`;
 
+// Crédito del desarrollador en el pie de página
+const DEV_NAME = "Fabrizio Turdo";
+const DEV_URL = "https://github.com/FabrizioTurdo-Dev";
+
 export function scrollToId(id) {
   document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
@@ -76,7 +80,13 @@ export function SiteFooter() {
           <a href={WA_URL} target="_blank" rel="noreferrer">WhatsApp</a>
         </div>
       </div>
-      <div className="site-footer-bottom">© {new Date().getFullYear()} Vexa · Hair Evolution</div>
+      <div className="site-footer-bottom">
+        <span>© {new Date().getFullYear()} Vexa · Hair Evolution</span>
+        <span className="site-footer-credits">
+          <Link to="/admin">Panel de administración</Link>
+          <span>Desarrollado por <a href={DEV_URL} target="_blank" rel="noreferrer">{DEV_NAME}</a></span>
+        </span>
+      </div>
     </footer>
   );
 }

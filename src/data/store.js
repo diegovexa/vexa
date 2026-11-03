@@ -53,6 +53,16 @@ export function normalizeProduct(p) {
   return { destacado: false, modo_uso: '', ...p, variantes };
 }
 
+// Orden de muestra: por línea y, dentro de cada una, shampoo → máscara → ampollas → protector térmico
+export function sortProducts(list) {
+  const pos = (arr, v) => (arr.indexOf(v) + 1 || arr.length + 1);
+  return [...list].sort((a, b) =>
+    pos(LINEAS, a.linea) - pos(LINEAS, b.linea) ||
+    pos(TIPOS, a.tipo) - pos(TIPOS, b.tipo) ||
+    a.producto.localeCompare(b.producto)
+  );
+}
+
 export function minPrice(p) {
   const prices = (p.variantes || []).map(v => v.precio).filter(Boolean);
   return prices.length ? Math.min(...prices) : 0;

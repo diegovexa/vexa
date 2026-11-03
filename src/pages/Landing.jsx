@@ -169,7 +169,7 @@ export default function Landing() {
             <Link
               to={`/linea/${l.slug}`}
               key={l.slug}
-              className={`line-card ${i === 0 ? "is-wide" : ""}`}
+              className={`line-card ${i === 0 ? "is-wide" : ""} ${i < 2 ? "is-split" : ""}`}
               style={{ "--accent": l.color }}
             >
               <img src={img(l.hero)} alt={l.nombre} loading="lazy" />

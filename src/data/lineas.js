@@ -85,7 +85,7 @@ export const LINEAS_INFO = [
     color: '#E8150F',
     soft: '#3a0605',
     necesidad: 'Post-coloración',
-    para: 'Cabello recién coloreado',
+    para: 'Cabello post coloración',
     claim: 'Sella la fibra y fija el color después de teñir.',
     descripcion:
       'Desarrollada para aplicar luego de la coloración en crema. Gracias a su pH extra ácido restaura el cabello en su totalidad, sella la fibra capilar y fija el color. Hidratación profunda y gran poder desenredante.',
