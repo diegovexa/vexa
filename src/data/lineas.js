@@ -95,25 +95,43 @@ export const LINEAS_INFO = [
     set: 'band-extra',
     beneficios: ['Fija el color', 'Sella la fibra', 'Hidratación profunda', 'Desenredante'],
   },
+  {
+    // Por ahora solo tiene protector térmico; sin pH en la etiqueta
+    slug: 'colageno-anti-age',
+    nombre: 'Colágeno Anti Age',
+    key: 'Colágeno Anti Age',
+    color: '#C9A24B',
+    soft: '#3a2f12',
+    necesidad: 'Protección térmica',
+    para: 'Todo tipo de cabello · antes del secador, la planchita o la buclera',
+    claim: 'Protege del calor hasta 230 °C con colágeno y elastina.',
+    descripcion:
+      'Protector térmico anti age con colágeno y elastina. Protege el cabello del calor hasta 230 °C, repara la fibra y potencia su brillo. Sin enjuague y de uso profesional, en presentaciones de 200 y 100 ml.',
+    ph: null,
+    hero: 'glow-colageno',
+    // Foto de estudio (fondo negro y brillo dorado) solo para su tarjeta en "Las líneas" del inicio
+    card: 'card-colageno',
+    destacado: 'colageno-protector',
+    set: 'promo-colageno',
+    beneficios: ['Heat shield 230 °C', 'Colágeno y elastina', 'Brillo y suavidad', 'Sin enjuague'],
+  },
 ];
 
 export function getLinea(slug) {
   return LINEAS_INFO.find((l) => l.slug === slug);
 }
 
-// Líneas que solo tienen protector térmico: aparecen en el catálogo pero no tienen página propia
-export const LINEAS_EXTRA = [
-  {
-    nombre: 'Colágeno Anti Age',
-    key: 'Colágeno Anti Age',
-    color: '#C9A24B',
-    soft: '#3a2f12',
-    necesidad: 'Protección térmica',
-    claim: 'Protege del calor hasta 230 °C con colágeno y elastina.',
-    destacado: 'colageno-protector',
-  },
-];
+// En las listas de productos (catálogo y páginas de línea) los protectores se ven como el resto:
+// el frasco sin fondo sobre el brillo del color de la línea, aunque tengan cargada una foto con fondo
+const RECORTES = {
+  'Protector térmico Biotina Therapy': 'biotina-protector',
+  'Protector térmico Colágeno Anti Age': 'colageno-protector',
+};
+export function conRecorte(p) {
+  const recorte = RECORTES[p.producto];
+  return recorte ? { ...p, image_url: img(recorte), foto: false } : p;
+}
 
 export function getLineaByKey(key) {
-  return LINEAS_INFO.find((l) => l.key === key) || LINEAS_EXTRA.find((l) => l.key === key);
+  return LINEAS_INFO.find((l) => l.key === key);
 }

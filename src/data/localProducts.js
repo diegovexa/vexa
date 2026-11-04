@@ -150,17 +150,17 @@ export const LANZAMIENTOS = [
   {
     nombre: 'Protector térmico Biotina Therapy',
     detalle: 'Con biotina y pantenol · Heat shield 230 °C · 100 y 200 ml',
-    image: 'promo-biotina-protector',
+    image: 'biotina-protector-foto',
     color: '#B430DE',
     disponible: true,
-    link: '/catalogo?tipo=Protector%20t%C3%A9rmico',
+    link: '/catalogo?linea=Biotina%20Therapy&tipo=Protector%20t%C3%A9rmico',
   },
   {
     nombre: 'Protector térmico Colágeno Anti Age',
     detalle: 'Con colágeno y elastina · Brillo y suavidad · 100 y 200 ml',
-    image: 'promo-colageno',
+    image: 'colageno-protector-foto',
     color: '#C9A24B',
     disponible: true,
-    link: '/catalogo?tipo=Protector%20t%C3%A9rmico',
+    link: '/catalogo?linea=Col%C3%A1geno%20Anti%20Age&tipo=Protector%20t%C3%A9rmico',
   },
 ];

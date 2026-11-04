@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { SiteHeader, SiteFooter, WA_URL } from "../components/SiteChrome";
 import ProductImage from "../components/ProductImage";
-import { LINEAS_INFO, getLinea, img } from "../data/lineas";
+import { LINEAS_INFO, getLinea, img, conRecorte } from "../data/lineas";
 import { formatPrice } from "../data/store";
 import { useApp } from "../context/AppContext";
 import "../styles/landing.css";
@@ -16,7 +16,7 @@ export default function Linea() {
 
   if (!linea) return <Navigate to="/" replace />;
 
-  const productos = products.filter((p) => p.linea === linea.key && p.active);
+  const productos = products.filter((p) => p.linea === linea.key && p.active).map(conRecorte);
   const idx = LINEAS_INFO.indexOf(linea);
   const next = LINEAS_INFO[(idx + 1) % LINEAS_INFO.length];
 
@@ -29,7 +29,7 @@ export default function Linea() {
         <div className="line-hero-inner">
           <div className="line-hero-copy">
             <Link to="/" className="back-link">← Todas las líneas</Link>
-            <span className="eyebrow">{linea.necesidad} · pH {linea.ph}</span>
+            <span className="eyebrow">{linea.necesidad}{linea.ph ? ` · pH ${linea.ph}` : ""}</span>
             <h1>{linea.nombre}</h1>
             <p className="hero-lead">{linea.descripcion}</p>
             <ul className="tag-list">

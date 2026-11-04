@@ -118,7 +118,7 @@
 .site-nav .site-nav-cta:hover { color: #0a0a0a; background: #fff; }
 .site-burger { display: none; }
 
-@media (max-width: 1060px) {
+@media (max-width: 1180px) {
   .site-burger {
     display: flex;
     flex-direction: column;
@@ -255,13 +255,14 @@
 .section-head p { color: var(--muted); font-size: 17px; }
 
 /* === Lines grid === */
+/* PC: dos tarjetas anchas arriba y cuatro abajo */
 .lines-grid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(12, 1fr);
   gap: 16px;
 }
 .line-card {
-  grid-column: span 2;
+  grid-column: span 3;
   position: relative;
   border-radius: var(--radius);
   overflow: hidden;
@@ -269,7 +270,7 @@
   background: #000;
   isolation: isolate;
 }
-.line-card:nth-child(1), .line-card:nth-child(2) { grid-column: span 3; aspect-ratio: 6 / 5; }
+.line-card:nth-child(1), .line-card:nth-child(2) { grid-column: span 6; aspect-ratio: 6 / 5; }
 .line-card img {
   position: absolute;
   inset: 0;
@@ -283,6 +284,8 @@
 .line-card:hover img { transform: scale(1.05); }
 /* Tarjetas anchas: la foto (4:5) entera a la derecha, fundida con un brillo del color de la línea */
 .line-card.is-split { background: radial-gradient(70% 90% at 75% 45%, color-mix(in srgb, var(--accent) 30%, #000), #000 75%); }
+.line-card:nth-child(n+3).is-split { background: #000; }
+.line-card:nth-child(n+3).is-split img { left: 0; width: 100%; -webkit-mask-image: none; mask-image: none; }
 .line-card.is-split img {
   left: auto;
   width: auto;
@@ -656,9 +659,12 @@
   .section { padding: 80px 20px; }
   .lines-grid { grid-template-columns: 1fr 1fr; }
   .line-card, .line-card:nth-child(1), .line-card:nth-child(2) { grid-column: span 1; aspect-ratio: 4 / 5; }
-  .line-card:nth-child(1) { grid-column: span 2; aspect-ratio: 6 / 5; }
-  /* En tablet solo la primera tarjeta es ancha; la segunda vuelve a la foto completa */
+  /* Tablet: la primera y la última son anchas, las del medio de a dos */
+  .line-card:nth-child(1), .line-card:nth-child(6) { grid-column: span 2; aspect-ratio: 6 / 5; }
+  .line-card:nth-child(2).is-split { background: #000; }
   .line-card:nth-child(2).is-split img { left: 0; width: 100%; -webkit-mask-image: none; mask-image: none; }
+  .line-card:nth-child(6).is-split { background: radial-gradient(70% 90% at 75% 45%, color-mix(in srgb, var(--accent) 30%, #000), #000 75%); }
+  .line-card:nth-child(6).is-split img { left: auto; width: auto; -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 28%); mask-image: linear-gradient(90deg, transparent 0, #000 28%); }
   .ritual { grid-template-columns: 1fr; }
   .finder-result { padding: 32px 24px; }
   .finder-media { height: 260px; }
@@ -686,8 +692,9 @@
   .hero-showcase { margin: 0 -16px; }
   .section { padding: 72px 16px; }
   .lines-grid { grid-template-columns: 1fr; }
-  .line-card, .line-card:nth-child(1), .line-card:nth-child(2) { grid-column: span 1; aspect-ratio: 4 / 5; }
-  .line-card.is-split img { left: 0; width: 100%; -webkit-mask-image: none; mask-image: none; }
+  .line-card, .line-card:nth-child(1), .line-card:nth-child(2), .line-card:nth-child(6) { grid-column: span 1; aspect-ratio: 4 / 5; }
+  .line-card.is-split, .line-card:nth-child(6).is-split { background: #000; }
+  .line-card.is-split img, .line-card:nth-child(6).is-split img { left: 0; width: 100%; -webkit-mask-image: none; mask-image: none; }
   .tiers { grid-template-columns: 1fr; }
   .site-footer-inner { grid-template-columns: 1fr; }
   .site-footer-brand { grid-column: auto; }

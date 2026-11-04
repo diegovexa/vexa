@@ -4,7 +4,7 @@ import { createPortal } from "react-dom";
 import { useApp } from "../context/AppContext";
 import { formatPrice, SELLER_PHONE, LINEAS, TIPOS } from "../data/store";
 import { buildCombos, computeCart } from "../data/pricing";
-import { img, getLineaByKey } from "../data/lineas";
+import { img, getLineaByKey, conRecorte } from "../data/lineas";
 import ProductImage from "../components/ProductImage";
 import ProductShowcase from "../components/ProductShowcase";
 import { SiteFooter } from "../components/SiteChrome";
@@ -512,7 +512,7 @@ export default function Catalogo() {
     const lineaOk = lineaFilter === "todas" || p.linea === lineaFilter;
     const tipoOk = tipoFilter === "todos" || p.tipo === tipoFilter;
     return lineaOk && tipoOk;
-  }), [products, lineaFilter, tipoFilter]);
+  }).map(conRecorte), [products, lineaFilter, tipoFilter]);
 
   const tiposDisponibles = TIPOS.filter(t => products.some(p => p.active && p.tipo === t));
 

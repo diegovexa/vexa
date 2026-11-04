@@ -8,9 +8,11 @@ export const WA_URL = `https://wa.me/${SELLER_PHONE}?text=${encodeURIComponent(
   "Hola! Quiero información para comprar Vexa por mayor."
 )}`;
 
-// Crédito del desarrollador en el pie de página
-const DEV_NAME = "Fabrizio Turdo";
-const DEV_URL = "https://github.com/FabrizioTurdo-Dev";
+// Crédito del desarrollador en el pie de página: abre su WhatsApp con un mensaje ya escrito
+const DEV_NAME = "Fabrizio Turdó";
+const DEV_URL = `https://wa.me/5491154922800?text=${encodeURIComponent(
+  "¡Hola, Fabrizio! Vi el sitio de Vexa y quiero una página para mi negocio."
+)}`;
 
 export function scrollToId(id) {
   document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });

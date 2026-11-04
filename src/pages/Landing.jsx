@@ -134,7 +134,7 @@ export default function Landing() {
               su <em>tratamiento</em>.
             </h1>
             <p className="hero-lead">
-              Vexa Hair Evolution reúne cinco líneas de shampoo, máscara y ampollas formuladas por pH,
+              Vexa Hair Evolution reúne seis líneas de shampoo, máscara, ampollas y protector térmico formuladas por pH,
               para resolver cada necesidad del cabello en el salón y en casa.
             </p>
             <div className="hero-ctas">
@@ -160,7 +160,7 @@ export default function Landing() {
       <section className="section" id="lineas">
         <div className="section-head">
           <span className="eyebrow">Las líneas</span>
-          <h2>Cinco fórmulas, un mismo estándar profesional.</h2>
+          <h2>Seis fórmulas, un mismo estándar profesional.</h2>
           <p>Cada línea tiene su color, su pH y su objetivo. Elegí por necesidad y combiná shampoo, máscara y ampollas.</p>
         </div>
 
@@ -169,12 +169,12 @@ export default function Landing() {
             <Link
               to={`/linea/${l.slug}`}
               key={l.slug}
-              className={`line-card ${i === 0 ? "is-wide" : ""} ${i < 2 ? "is-split" : ""}`}
+              className={`line-card ${i === 0 ? "is-wide" : ""} ${i < 2 || i === 5 ? "is-split" : ""}`}
               style={{ "--accent": l.color }}
             >
-              <img src={img(l.hero)} alt={l.nombre} loading="lazy" />
+              <img src={img(l.card || l.hero)} alt={l.nombre} loading="lazy" />
               <div className="line-card-body">
-                <span className="line-card-ph">pH {l.ph}</span>
+                <span className="line-card-ph">{l.ph ? `pH ${l.ph}` : l.necesidad}</span>
                 <h3>{l.nombre}</h3>
                 <p>{l.claim}</p>
                 <span className="line-card-more">Descubrir →</span>
