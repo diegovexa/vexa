@@ -763,6 +763,7 @@
 .launch-body h3 { font-size: clamp(22px, 2.4vw, 30px); }
 .launch-body p { color: var(--muted); font-size: 14.5px; }
 .launch-body .btn { margin-top: 8px; }
+.launch-ctas { display: flex; flex-wrap: wrap; gap: 10px; }
 
 /* Tiers dinámicos (mayoristas) */
 .tiers strong { font-size: 24px; }

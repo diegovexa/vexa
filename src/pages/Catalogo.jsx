@@ -168,15 +168,15 @@ function ProductCard({ product, onAdd }) {
 
   return (
     <article className="pcard" style={{ "--accent": accent }}>
-      <div className="pcard-media">
+      <Link to={productoPath(product)} className="pcard-media" aria-label={`Ver ${product.producto}`}>
         <ProductImage product={product} imgRef={imgRef} />
         <span className="pcard-badge">{linea?.nombre || product.linea}</span>
         {product.nuevo && <span className="pcard-new">Nuevo</span>}
-      </div>
+      </Link>
 
       <div className="pcard-body">
         <div className="pcard-kind">{product.tipo}{product.ph && product.ph !== "-" ? ` · pH ${product.ph}` : ""}</div>
-        <h3 className="pcard-name">{product.producto}</h3>
+        <h3 className="pcard-name"><Link to={productoPath(product)}>{product.producto}</Link></h3>
 
         {beneficios.length > 0 && (
           <div className="pcard-tags">

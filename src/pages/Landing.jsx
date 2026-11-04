@@ -8,7 +8,7 @@ import { LANZAMIENTOS } from "../data/localProducts";
 import { formatPrice, minPrice } from "../data/store";
 import { getComboPct, getTiers } from "../data/pricing";
 import { useApp } from "../context/AppContext";
-import { HOME_META, setPageMeta } from "../data/seo";
+import { HOME_META, setPageMeta, productoPath } from "../data/seo";
 import "../styles/landing.css";
 
 // Escala de pH de cada producto (PDF "Vexa Enero 2026")
@@ -86,7 +86,7 @@ function BestSellers({ products }) {
           return (
             <Link
               key={p.id}
-              to={`/catalogo?linea=${encodeURIComponent(p.linea)}`}
+              to={productoPath(p)}
               className="best-card"
               style={{ "--accent": linea?.color }}
             >
@@ -103,7 +103,7 @@ function BestSellers({ products }) {
                     {p.variantes.length > 1 && <small>desde </small>}
                     <strong>{formatPrice(minPrice(p))}</strong>
                   </span>
-                  <span className="best-cta">Comprar →</span>
+                  <span className="best-cta">Ver producto →</span>
                 </div>
               </div>
             </Link>
@@ -202,7 +202,10 @@ export default function Landing() {
                 <h3>{l.nombre}</h3>
                 <p>{l.detalle}</p>
                 {l.disponible ? (
-                  <Link to={l.link} className="btn btn-light">Comprar</Link>
+                  <div className="launch-ctas">
+                    <Link to={l.link} className="btn btn-light">Comprar</Link>
+                    <Link to={productoPath({ producto: l.nombre })} className="btn btn-ghost">Ver producto</Link>
+                  </div>
                 ) : (
                   <a href={WA_URL} target="_blank" rel="noreferrer" className="btn btn-ghost">Consultar por WhatsApp</a>
                 )}
