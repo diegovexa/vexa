@@ -5,6 +5,7 @@ import ProductImage from "../components/ProductImage";
 import { LINEAS_INFO, getLinea, img, conRecorte } from "../data/lineas";
 import { formatPrice } from "../data/store";
 import { useApp } from "../context/AppContext";
+import { lineaMeta, setPageMeta } from "../data/seo";
 import "../styles/landing.css";
 
 export default function Linea() {
@@ -13,6 +14,7 @@ export default function Linea() {
   const { products } = useApp();
 
   useEffect(() => { window.scrollTo(0, 0); }, [slug]);
+  useEffect(() => { if (linea) setPageMeta(lineaMeta(linea)); }, [linea]);
 
   if (!linea) return <Navigate to="/" replace />;
 

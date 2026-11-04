@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { SiteHeader, SiteFooter, WA_URL, scrollToId } from "../components/SiteChrome";
 import ProductImage from "../components/ProductImage";
@@ -8,6 +8,7 @@ import { LANZAMIENTOS } from "../data/localProducts";
 import { formatPrice, minPrice } from "../data/store";
 import { getComboPct, getTiers } from "../data/pricing";
 import { useApp } from "../context/AppContext";
+import { HOME_META, setPageMeta } from "../data/seo";
 import "../styles/landing.css";
 
 // Escala de pH de cada producto (PDF "Vexa Enero 2026")
@@ -117,6 +118,7 @@ export default function Landing() {
   const { products, config } = useApp();
   const comboPct = getComboPct(config);
   const tiers = getTiers(config);
+  useEffect(() => { setPageMeta(HOME_META); }, []);
 
   return (
     <div className="site">

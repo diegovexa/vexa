@@ -692,7 +692,7 @@ function AdminApp() {
           ))}
         </nav>
         <div className="admin-sidebar-footer">
-          <a href="#/catalogo" className="admin-sidebar-link">🌐 Ver catálogo</a>
+          <a href="/catalogo" className="admin-sidebar-link">🌐 Ver catálogo</a>
           <button onClick={signOut} className="admin-sidebar-logout">🚪 Cerrar sesión</button>
         </div>
       </div>

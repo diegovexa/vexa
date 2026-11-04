@@ -8,6 +8,7 @@ import { img, getLineaByKey, conRecorte } from "../data/lineas";
 import ProductImage from "../components/ProductImage";
 import ProductShowcase from "../components/ProductShowcase";
 import { SiteFooter } from "../components/SiteChrome";
+import { CATALOGO_META, setPageMeta } from "../data/seo";
 import "../styles/catalogo.css";
 
 function WhatsAppIcon({ size = 20 }) {
@@ -502,6 +503,7 @@ export default function Catalogo() {
   const toastTimer = useRef();
 
   useEffect(() => { window.scrollTo(0, 0); }, [view, vista]);
+  useEffect(() => { setPageMeta(CATALOGO_META); }, []);
 
   const combos = useMemo(() => buildCombos(products, config), [products, config]);
   const comboPct = combos[0]?.pct ?? 0;

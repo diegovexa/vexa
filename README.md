@@ -58,7 +58,7 @@ npm run dev
 
 Abrir en el navegador:
 - **Catálogo:** http://localhost:5173
-- **Admin:** http://localhost:5173/#/admin
+- **Admin:** http://localhost:5173/admin
 
 ---
 
@@ -111,7 +111,7 @@ catalogo-mayorista/
 - Envío de pedido por WhatsApp con resumen detallado
 - Responsive (mobile-first)
 
-### Panel de administración (`/#/admin`)
+### Panel de administración (`/admin`)
 - **Login** con email y contraseña (Supabase Auth)
 - **Productos:** crear, editar, eliminar, subir imágenes, activar/desactivar
 - **Pedidos:** ver pedidos, cambiar estado (pendiente → confirmado → enviado), enviar confirmación por WhatsApp
