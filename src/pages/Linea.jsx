@@ -5,7 +5,7 @@ import ProductImage from "../components/ProductImage";
 import { LINEAS_INFO, getLinea, img, conRecorte } from "../data/lineas";
 import { formatPrice } from "../data/store";
 import { useApp } from "../context/AppContext";
-import { lineaMeta, setPageMeta } from "../data/seo";
+import { lineaMeta, setPageMeta, productoPath } from "../data/seo";
 import "../styles/landing.css";
 
 export default function Linea() {
@@ -64,7 +64,7 @@ export default function Linea() {
               </div>
               <div className="product-copy">
                 <span className="product-kind">{p.tipo}</span>
-                <h3>{p.producto}</h3>
+                <h3><Link to={productoPath(p)}>{p.producto}</Link></h3>
                 {p.ph && p.ph !== "-" && (
                   <dl className="product-specs"><div><dt>pH</dt><dd>{p.ph}</dd></div></dl>
                 )}
@@ -85,6 +85,7 @@ export default function Linea() {
                     <p>{p.modo_uso}</p>
                   </details>
                 )}
+                <Link to={productoPath(p)} className="product-more">Ver ficha del producto →</Link>
               </div>
             </article>
           ))}

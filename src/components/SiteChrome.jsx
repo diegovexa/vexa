@@ -79,6 +79,7 @@ export function SiteFooter() {
           <h4>Comprar</h4>
           <Link to="/catalogo">Catálogo mayorista</Link>
           <Link to="/catalogo?vista=combos">Tratamientos completos</Link>
+          <Link to="/preguntas-frecuentes">Preguntas frecuentes</Link>
           <a href={WA_URL} target="_blank" rel="noreferrer">WhatsApp</a>
         </div>
       </div>

@@ -8,7 +8,7 @@ import { img, getLineaByKey, conRecorte } from "../data/lineas";
 import ProductImage from "../components/ProductImage";
 import ProductShowcase from "../components/ProductShowcase";
 import { SiteFooter } from "../components/SiteChrome";
-import { CATALOGO_META, setPageMeta } from "../data/seo";
+import { CATALOGO_META, setPageMeta, productoPath } from "../data/seo";
 import "../styles/catalogo.css";
 
 function WhatsAppIcon({ size = 20 }) {
@@ -129,6 +129,7 @@ function ProductDetail({ product, accent, onClose }) {
           {product.modo_uso && (
             <div className="pdetail-block pcard-uso"><strong>Modo de uso</strong><span>{product.modo_uso}</span></div>
           )}
+          <Link to={productoPath(product)} className="pdetail-page" onClick={onClose}>Ver página del producto →</Link>
         </div>
       </div>
     </div>,

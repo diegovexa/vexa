@@ -494,6 +494,8 @@
 .pdetail-block { display: flex; flex-direction: column; gap: 4px; }
 .pdetail-block strong { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
 .pdetail-block span { color: var(--text); }
+.pdetail-page { align-self: flex-start; font-size: 13.5px; font-weight: 600; color: var(--accent) !important; text-decoration: none; }
+.pdetail-page:hover { text-decoration: underline; text-underline-offset: 3px; }
 @keyframes pdetailFade { from { opacity: 0; } }
 @keyframes pdetailUp { from { transform: translateY(40px); opacity: 0; } }
 @media (min-width: 640px) {

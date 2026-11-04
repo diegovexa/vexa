@@ -6,6 +6,8 @@ import { AppProvider } from "./context/AppContext";
 import Landing from "./pages/Landing";
 import Linea from "./pages/Linea";
 import Catalogo from "./pages/Catalogo";
+import Producto from "./pages/Producto";
+import Preguntas from "./pages/Preguntas";
 import Admin from "./pages/Admin";
 
 export default function App() {
@@ -15,6 +17,8 @@ export default function App() {
         <Routes>
           <Route path="/"             element={<Landing />} />
           <Route path="/linea/:slug"  element={<Linea />} />
+          <Route path="/producto/:slug" element={<Producto />} />
+          <Route path="/preguntas-frecuentes" element={<Preguntas />} />
           <Route path="/catalogo"     element={<Catalogo />} />
           <Route path="/admin"        element={<Admin />} />
         </Routes>

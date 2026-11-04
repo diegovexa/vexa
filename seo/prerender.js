@@ -29,32 +29,61 @@ async function loadData(root) {
     const productos = await server.ssrLoadModule('/src/data/localProducts.js');
     const store = await server.ssrLoadModule('/src/data/store.js');
     const seo = await server.ssrLoadModule('/src/data/seo.js');
-    return { ...lineas, ...productos, ...store, ...seo };
+    const faq = await server.ssrLoadModule('/src/data/faq.js');
+    return { ...lineas, ...productos, ...store, ...seo, ...faq };
   } finally {
     await server.close();
   }
 }
 
+// Productos publicados en Supabase (lo que carga el admin). Si no hay credenciales o no
+// responde, se usan los productos locales de src/data/localProducts.js.
+async function loadProducts(env, d) {
+  const url = env.VITE_SUPABASE_URL;
+  const key = env.VITE_SUPABASE_ANON_KEY;
+  if (url && key) {
+    try {
+      const res = await fetch(`${url}/rest/v1/productos?select=*&active=eq.true`, {
+        headers: { apikey: key, Authorization: `Bearer ${key}` },
+        signal: AbortSignal.timeout(10000),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const rows = await res.json();
+      if (rows.length) {
+        console.log(`[vexa-seo] ${rows.length} productos desde Supabase`);
+        return d.sortProducts(rows.map(d.normalizeProduct));
+      }
+    } catch (err) {
+      console.warn(`[vexa-seo] Supabase no respondió (${err.message}), uso los productos locales`);
+    }
+  }
+  return d.sortProducts(d.LOCAL_PRODUCTS.filter((p) => p.active).map(d.normalizeProduct));
+}
+
 export default function seoPrerender() {
   let root;
   let outDir;
+  let env;
   return {
     name: 'vexa-seo-prerender',
     apply: 'build',
     configResolved(config) {
       root = config.root;
       outDir = path.resolve(config.root, config.build.outDir);
+      env = config.env;
     },
     async closeBundle() {
       const d = await loadData(root);
-      const { SITE_URL, SITE_NAME, BRAND, LINEAS_INFO, LOCAL_PRODUCTS, TIPOS, SELLER_PHONE } = d;
+      const { SITE_URL, SITE_NAME, BRAND, LINEAS_INFO, SELLER_PHONE, FAQ, productoPath } = d;
+      const PRODUCTS = await loadProducts(env, d);
       const waUrl = `https://wa.me/${SELLER_PHONE}`;
       const telefono = `+${SELLER_PHONE}`;
-      const productosDe = (linea) =>
-        LOCAL_PRODUCTS.filter((p) => p.active && p.linea === linea.key).sort(
-          (a, b) => TIPOS.indexOf(a.tipo) - TIPOS.indexOf(b.tipo)
-        );
+      const productosDe = (linea) => PRODUCTS.filter((p) => p.linea === linea.key);
       const abs = (p) => SITE_URL + p;
+      const absImg = (u) => (!u ? null : /^https?:/.test(u) ? u : abs(u.startsWith('/') ? u : `/${u}`));
+      // [texto](/ruta) → <a> en HTML, o link absoluto en markdown
+      const htmlLinks = (t) => esc(t).replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+      const mdLinks = (t) => t.replace(/\]\((\/[^)]*)\)/g, (_, u) => `](${abs(u)})`);
       const ogImage = abs('/og-vexa.jpg');
 
       // ---------- Datos estructurados (schema.org) ----------
@@ -93,7 +122,7 @@ export default function seoPrerender() {
       // ---------- Bloques de contenido en HTML plano ----------
       const productoHtml = (p, conUso) => `
         <article>
-          <h3>${esc(p.producto)}</h3>
+          <h3><a href="${productoPath(p)}">${esc(p.producto)}</a></h3>
           <p>${esc(p.descripcion)}</p>
           <ul>
             <li><strong>Tipo:</strong> ${esc(p.tipo)}</li>
@@ -132,8 +161,78 @@ export default function seoPrerender() {
       const nav = `
         <nav>
           <a href="/">Inicio</a> · <a href="/catalogo">Catálogo mayorista</a> ·
+          <a href="/preguntas-frecuentes">Preguntas frecuentes</a> ·
           ${LINEAS_INFO.map((l) => `<a href="/linea/${l.slug}">${esc(l.nombre)}</a>`).join(' · ')}
         </nav>`;
+
+      // Producto con precios de lista (los mismos que muestra la página al cargarse)
+      const productSchema = (p, linea) => {
+        const precios = (p.variantes || []).map((v) => v.precio).filter((n) => n > 0);
+        const schema = {
+          '@type': 'Product',
+          '@id': abs(`${productoPath(p)}#product`),
+          name: p.producto,
+          description: p.descripcion,
+          category: `Cuidado del cabello > ${p.tipo}`,
+          brand: { '@type': 'Brand', name: 'Vexa' },
+          url: abs(productoPath(p)),
+        };
+        const img = absImg(p.image_url);
+        if (img) schema.image = img;
+        if (linea) schema.isRelatedTo = { '@type': 'ProductGroup', name: `Línea ${linea.nombre}`, url: abs(`/linea/${linea.slug}`) };
+        if (precios.length) {
+          schema.offers = {
+            '@type': 'AggregateOffer',
+            priceCurrency: 'ARS',
+            lowPrice: Math.min(...precios),
+            highPrice: Math.max(...precios),
+            offerCount: precios.length,
+            url: abs(productoPath(p)),
+            seller: { '@id': abs('/#organization') },
+          };
+        }
+        return schema;
+      };
+
+      const productoPage = (p) => {
+        const linea = LINEAS_INFO.find((l) => l.key === p.linea);
+        const hermanos = PRODUCTS.filter((x) => x.linea === p.linea && x.id !== p.id);
+        const precios = (p.variantes || [])
+          .filter((v) => v.precio > 0)
+          .map((v) => `${v.tamanio}: ${d.formatPrice(v.precio)}`)
+          .join(' · ');
+        return {
+          url: productoPath(p),
+          file: `${productoPath(p).slice(1)}/index.html`,
+          meta: d.productoMeta(p),
+          jsonld: [
+            organization,
+            website,
+            breadcrumb([['Inicio', '/'], ...(linea ? [[linea.nombre, `/linea/${linea.slug}`]] : []), [p.producto, productoPath(p)]]),
+            productSchema(p, linea),
+          ],
+          body: `${nav}
+            <article>
+              <h1>${esc(p.producto)}</h1>
+              <p>${esc(linea?.nombre || p.linea)} · ${esc(p.tipo)}${p.ph && p.ph !== '-' ? ` · pH ${esc(p.ph)}` : ''}</p>
+              <p>${esc(p.descripcion)}</p>
+              <ul>
+                ${tamanios(p) ? `<li><strong>Presentaciones:</strong> ${esc(tamanios(p))}</li>` : ''}
+                ${precios ? `<li><strong>Precio mayorista de lista:</strong> ${esc(precios)} (con descuentos por cantidad en el catálogo)</li>` : ''}
+                ${p.beneficios ? `<li><strong>Beneficios:</strong> ${esc(lista(p.beneficios).join(', '))}</li>` : ''}
+                ${p.indicaciones ? `<li><strong>Indicado para:</strong> ${esc(lista(p.indicaciones).join(', '))}</li>` : ''}
+                ${p.modo_uso ? `<li><strong>Modo de uso:</strong> ${esc(p.modo_uso)}</li>` : ''}
+              </ul>
+              ${linea ? `<p>Parte de la línea <a href="/linea/${linea.slug}">${esc(linea.nombre)}</a>: ${esc(linea.claim)}</p>` : ''}
+            </article>
+            ${hermanos.length ? `<section><h2>Completá el tratamiento</h2><ul>${hermanos
+              .map((h) => `<li><a href="${productoPath(h)}">${esc(h.producto)}</a> (${esc(h.tipo)})</li>`)
+              .join('')}</ul></section>` : ''}
+            ${comoComprar}`,
+        };
+      };
+
+      const faqItems = FAQ.flatMap((g) => g.items);
 
       // ---------- Páginas ----------
       const pages = [
@@ -171,6 +270,33 @@ export default function seoPrerender() {
           jsonld: [organization, website, breadcrumb([['Inicio', '/'], [l.nombre, `/linea/${l.slug}`]])],
           body: `${nav}${lineaHtml(l, 1, true)}${comoComprar}`,
         })),
+        ...PRODUCTS.map(productoPage),
+        {
+          url: '/preguntas-frecuentes',
+          file: 'preguntas-frecuentes/index.html',
+          meta: d.FAQ_META,
+          jsonld: [
+            organization,
+            website,
+            breadcrumb([['Inicio', '/'], ['Preguntas frecuentes', '/preguntas-frecuentes']]),
+            {
+              '@type': 'FAQPage',
+              mainEntity: faqItems.map((f) => ({
+                '@type': 'Question',
+                name: f.q,
+                acceptedAnswer: { '@type': 'Answer', text: d.sinLinks(f.a) },
+              })),
+            },
+          ],
+          body: `${nav}
+            <h1>Preguntas frecuentes</h1>
+            ${FAQ.map((g) => `
+              <section>
+                <h2>${esc(g.grupo)}</h2>
+                ${g.items.map((f) => `<h3>${esc(f.q)}</h3><p>${htmlLinks(f.a)}</p>`).join('')}
+              </section>`).join('')}
+            ${comoComprar}`,
+        },
       ];
 
       const template = await fs.readFile(path.join(outDir, 'index.html'), 'utf8');
@@ -232,15 +358,19 @@ ${pages.map((p) => `  <url><loc>${abs(p.url)}</loc><lastmod>${hoy}</lastmod></ur
           '',
           ...productosDe(l).map(
             (p) =>
-              `- **${p.producto}** (${p.tipo}${tamanios(p) ? `; ${tamanios(p)}` : ''}): ${p.descripcion}` +
+              `- [${p.producto}](${abs(productoPath(p))}) (${p.tipo}${tamanios(p) ? `; ${tamanios(p)}` : ''}): ${p.descripcion}` +
               (p.indicaciones ? ` Indicado para: ${lista(p.indicaciones).join(', ')}.` : '')
           ),
           '',
         ]),
+        '## Preguntas frecuentes',
+        '',
+        ...faqItems.flatMap((f) => [`### ${f.q}`, '', mdLinks(f.a), '']),
         '## Páginas',
         '',
         `- [Inicio](${abs('/')}): presentación de la marca y sus líneas`,
         `- [Catálogo mayorista](${abs('/catalogo')}): todos los productos, precios por presentación y pedido por WhatsApp`,
+        `- [Preguntas frecuentes](${abs('/preguntas-frecuentes')}): qué producto elegir, cómo se usan y cómo comprar por mayor`,
         '',
       ].join('\n');
       await fs.writeFile(path.join(outDir, 'llms.txt'), md);

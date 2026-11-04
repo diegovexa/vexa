@@ -24,9 +24,32 @@ export function lineaMeta(linea) {
   };
 }
 
-export function lineaMetaBySlug(slug) {
-  const linea = LINEAS_INFO.find((l) => l.slug === slug);
-  return linea ? lineaMeta(linea) : HOME_META;
+export const FAQ_META = {
+  title: 'Preguntas frecuentes | Vexa Hair Evolution',
+  description:
+    'Qué producto Vexa usar para la caída, el frizz, después de teñir o para proteger del calor, cómo se aplican y cómo comprar por mayor.',
+};
+
+// "Protector térmico Colágeno Anti Age" → "protector-termico-colageno-anti-age"
+export function productoSlug(nombre) {
+  return String(nombre || '')
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+export const productoPath = (p) => `/producto/${productoSlug(p.producto)}`;
+
+export function productoMeta(p) {
+  const tamanios = (p.variantes || []).map((v) => v.tamanio).join(' y ');
+  const desc = String(p.descripcion || '').trim();
+  const corta = desc.length > 150 ? `${desc.slice(0, desc.lastIndexOf(' ', 147))}…` : desc;
+  return {
+    title: `${p.producto}${tamanios ? ` ${tamanios}` : ''} | Vexa Hair Evolution`,
+    description: `${corta} Venta mayorista.`,
+  };
 }
 
 // Actualiza la pestaña y la descripción al navegar dentro de la app
