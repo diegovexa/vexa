@@ -112,7 +112,7 @@ export const LINEAS_INFO = [
     // Foto de estudio (fondo negro y brillo dorado) solo para su tarjeta en "Las líneas" del inicio
     card: 'card-colageno',
     destacado: 'colageno-protector',
-    set: 'promo-colageno',
+    set: 'colageno-protector-foto',
     beneficios: ['Heat shield 230 °C', 'Colágeno y elastina', 'Brillo y suavidad', 'Sin enjuague'],
   },
 ];
