@@ -2,6 +2,13 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
+    <!-- Google Tag Manager (GTM-T6SNPGW5): desde ahí se maneja Google Analytics.
+         No se carga en el panel de administración para no contar las visitas propias. -->
+    <script>
+      if (!location.pathname.startsWith('/admin')) {
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-T6SNPGW5');
+      }
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -19,10 +26,12 @@
     </style>
     <link rel="icon" href="/favicon.ico" sizes="48x48" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-192.png" type="image/png" sizes="192x192" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="theme-color" content="#0a0a0a" />
   </head>
   <body>
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T6SNPGW5" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div id="root"></div>
     <script type="module" src="./src/main.jsx"></script>
   </body>
