@@ -359,7 +359,7 @@ function CartView({ summary, onClose, onSent }) {
   const minOrder = Number(config?.min_order) || 0;
   const belowMin = minOrder > 0 && total < minOrder;
 
-  async function sendToWhatsApp() {
+  function sendToWhatsApp() {
     let msg = "Hola! Quiero realizar el siguiente pedido:\n\n";
     lines.forEach(l => {
       msg += `• ${l.name} — ${l.tamanio} x${l.qty} = ${formatPrice(l.totalLinea)}${l.pct ? ` (-${l.pct}%)` : ""}\n`;
@@ -371,8 +371,11 @@ function CartView({ summary, onClose, onSent }) {
     if (name) msg += `\nNombre: ${name}`;
     if (phone) msg += `\nTeléfono: ${phone}`;
 
-    try {
-      await addOrder({
+    // El pedido se guarda en segundo plano, sin esperar: en el teléfono el navegador solo
+    // deja abrir WhatsApp en el mismo instante del toque. Si antes se espera a la base de
+    // datos, lo toma como ventana emergente y la bloquea sin avisar.
+    Promise.resolve()
+      .then(() => addOrder({
         cliente_nombre: name || "Cliente nuevo",
         cliente_telefono: phone,
         items: lines.map(l => ({
@@ -380,13 +383,15 @@ function CartView({ summary, onClose, onSent }) {
           qty: l.qty, descuento_pct: l.pct, total: l.totalLinea,
         })),
         total,
-      });
-    } catch (err) {
-      console.error("Error guardando pedido:", err);
-    }
+      }))
+      .catch(err => console.error("Error guardando pedido:", err));
 
     const phoneNumber = config?.phone || SELLER_PHONE;
-    window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(msg)}`, "_blank");
+    const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(msg)}`;
+    const win = window.open(url, "_blank");
+    // Si igual se bloqueó la pestaña nueva (navegadores dentro de Instagram/Facebook, etc.),
+    // se abre WhatsApp en la misma pestaña.
+    if (!win) window.location.href = url;
     setSent(true);
     onSent();
   }
